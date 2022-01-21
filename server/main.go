@@ -34,7 +34,7 @@ func main() {
 	if l, err := net.Listen("tcp", ":8080"); err != nil {
 		log.Fatal("error in listening on port :8080", err)
 	} else {
-		// the gRPC server
+		// the start gRPC server
 		if err:=server.Serve(l);err!=nil {
 			log.Fatal("unable to start server",err)
 		}
