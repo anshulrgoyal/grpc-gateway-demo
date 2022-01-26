@@ -5,10 +5,12 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 
 	"github.com/felixge/httpsnoop"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	gen "grpc-gateway-demo/gen/go/hello"
 )
 
@@ -19,9 +21,33 @@ func withLogger(handler http.Handler) http.Handler {
 	})
 }
 
+func convertToMetadata(m map[string][]string) map[string]string{
+	newM:=make(map[string]string,len(m))
+	for key,value:=range m{
+		newM[key]=value[0]
+	}
+	return newM
+}
+
+var allowedHeaders=map[string]struct{}{
+	"X-REQUEST-ID": {},
+}
+
+func isHeaderAllowed(s string)( string,bool) {
+	if _,isAllowed:=allowedHeaders[s];isAllowed {
+		return strings.ToLower(s),true
+	}
+	return s,false
+}
+
 func main() {
 	// creating mux for gRPC gateway. This will multiplex or route request different gRPC service
 	mux:=runtime.NewServeMux(
+		runtime.WithOutgoingHeaderMatcher(isHeaderAllowed),
+		runtime.WithMetadata(func(ctx context.Context, request *http.Request) metadata.MD {
+			md:=metadata.New(convertToMetadata(request.Header))
+			return md
+		}),
 		runtime.WithErrorHandler(func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, writer http.ResponseWriter, request *http.Request, err error) {
 			//creating a new HTTTPStatusError with a custom status, and passing error
 			newError:=runtime.HTTPStatusError{
