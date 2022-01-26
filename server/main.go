@@ -24,7 +24,7 @@ func (g *GreeterServerImpl) SayHello(ctx context.Context, request *gen.HelloRequ
 		return nil,err
 	}
 	return &gen.HelloReply{
-		Message: fmt.Sprintf("hello %s",request.Name),
+		Message: fmt.Sprintf("hello %s %s",request.Name,request.LastName),
 	},nil
 }
 

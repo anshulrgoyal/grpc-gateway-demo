@@ -21,17 +21,6 @@ func withLogger(handler http.Handler) http.Handler {
 	})
 }
 
-func convertToMetadata(m map[string][]string) map[string]string{
-	// make a map
-	newM:=make(map[string]string,len(m))
-	for key,value:=range m{
-		// add only first value
-		newM[key]=value[0]
-	}
-	// return the map
-	return newM
-}
-
 var allowedHeaders=map[string]struct{}{
 	"x-request-id": {},
 }
@@ -52,8 +41,9 @@ func main() {
 		// convert header in response(going from gateway) from metadata received.
 		runtime.WithOutgoingHeaderMatcher(isHeaderAllowed),
 		runtime.WithMetadata(func(ctx context.Context, request *http.Request) metadata.MD {
+			header:=request.Header.Get("Authorization")
 			// send all the headers received from the client
-			md:=metadata.New(convertToMetadata(request.Header))
+			md:=metadata.Pairs("auth",header)
 			return md
 		}),
 		runtime.WithErrorHandler(func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, writer http.ResponseWriter, request *http.Request, err error) {

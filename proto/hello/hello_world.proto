@@ -11,6 +11,7 @@ package hello_world;
 
 message HelloRequest {
   string name = 1 [(validate.rules).string = {min_bytes:8, max_bytes: 256,}];
+  string last_name =2;
 }
 
 message HelloReply {
