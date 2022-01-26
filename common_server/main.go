@@ -55,11 +55,20 @@ func main() {
 		log.Fatal(err)
 	}
 	m := cmux.New(l)
+
+	// a different listener for HTTP1
 	httpL := m.Match(cmux.HTTP1Fast())
+
+	// a different listener for HTTP2 since gRPC uses HTTP2
 	grpcL := m.Match(cmux.HTTP2())
 	// start server
+
+	// passing dummy listener
 	go server.Serve(httpL)
+	// passing dummy listener
 	go grpcSever.Serve(grpcL)
+
+	// actual listener
 	m.Serve()
 }
 
