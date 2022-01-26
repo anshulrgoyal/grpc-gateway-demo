@@ -20,6 +20,9 @@ type GreeterServerImpl struct {
 // SayHello is the implementation of RPC call defined in protocol definitions.
 // This will take HelloRequest message and return HelloReply
 func (g *GreeterServerImpl) SayHello(ctx context.Context, request *gen.HelloRequest) (*gen.HelloReply, error) {
+	if err:=request.Validate();err!=nil {
+		return nil,err
+	}
 	return &gen.HelloReply{
 		Message: fmt.Sprintf("hello %s",request.Name),
 	},nil

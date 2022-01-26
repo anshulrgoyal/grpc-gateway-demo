@@ -4,12 +4,13 @@ option go_package = "github.com/anshulrgoyal/grpc-gateway-demo;grpc_gateway_demo
 
 
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 
 package hello_world;
 
 message HelloRequest {
-  string name = 1;
+  string name = 1 [(validate.rules).string = {min_bytes:8, max_bytes: 256,}];
 }
 
 message HelloReply {

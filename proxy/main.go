@@ -18,7 +18,11 @@ func withLogger(handler http.Handler) http.Handler {
 		log.Printf("http[%d]-- %s -- %s\n",m.Code,m.Duration,request.URL.Path)
 	})
 }
+/*
+runtime.WithErrorHandler(func(_ context.Context, _ *runtime.ServeMux,_ runtime.Marshaler, _ http.ResponseWriter, request *http.Request, err error) {
 
+	})
+ */
 func main() {
 	// creating mux for gRPC gateway. This will multiplex or route request different gRPC service
 	mux:=runtime.NewServeMux()
