@@ -22,29 +22,37 @@ func withLogger(handler http.Handler) http.Handler {
 }
 
 func convertToMetadata(m map[string][]string) map[string]string{
+	// make a map
 	newM:=make(map[string]string,len(m))
 	for key,value:=range m{
+		// add only first value
 		newM[key]=value[0]
 	}
+	// return the map
 	return newM
 }
 
 var allowedHeaders=map[string]struct{}{
-	"X-REQUEST-ID": {},
+	"x-request-id": {},
 }
 
 func isHeaderAllowed(s string)( string,bool) {
+	// check if allowedHeaders contain the header
 	if _,isAllowed:=allowedHeaders[s];isAllowed {
-		return strings.ToLower(s),true
+		// send uppercase header
+		return strings.ToUpper(s),true
 	}
+	// if not in allowed header, don't send the header
 	return s,false
 }
 
 func main() {
 	// creating mux for gRPC gateway. This will multiplex or route request different gRPC service
 	mux:=runtime.NewServeMux(
+		// convert header in response(going from gateway) from metadata received.
 		runtime.WithOutgoingHeaderMatcher(isHeaderAllowed),
 		runtime.WithMetadata(func(ctx context.Context, request *http.Request) metadata.MD {
+			// send all the headers received from the client
 			md:=metadata.New(convertToMetadata(request.Header))
 			return md
 		}),
