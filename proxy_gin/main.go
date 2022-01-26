@@ -55,7 +55,12 @@ func main() {
 	// Creating a normal HTTP server
 	server:=gin.New()
 	server.Use(gin.Logger())
-	server.Any("v1/*{grpc_gateway}",gin.WrapH(mux))
+	server.Group("v1/*{grpc_gateway}").Any("",gin.WrapH(mux))
+
+	server.GET("/test", func(c *gin.Context) {
+		c.String(http.StatusOK,"Ok")
+	})
+
 
 	// start server
 	err = server.Run(":8081")
